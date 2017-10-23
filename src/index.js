@@ -87,16 +87,39 @@ function getWelcomeResponse(callback) {
 
 }
 
+
+
 function handleGetFoodItemResopnse(intent, session, callback) {
-    var item = intent.slots.ItemName.value
-    
-    var header = item
-    var speechOutput = item
-    var repromptText = "Say something, I'm not giving up on you?"
+    getJSON(function(itemData) {
+      var itemName = intent.slots.ItemName.value
+      console.log(itemName)
+      var speechOutput = "There was an error"
+      var repromptText = ''
+      var shouldEndSession = false
+      if (itemData != "ERORR") {
+      itemData.forEach(function(item) {
+        if(item.food === itemName) {
+          speechOutput = item.food
+        }
+      })
 
-    var shouldEndSession = false
+      }
+      callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+    })
+}
 
-    callback(session.attributes, buildSpeechletResponse(header, speechOutput, repromptText, shouldEndSession))
+function getJSON(callback){
+  request.get(url(), function(error, response, body){
+    var itemData = JSON.parse(body);
+    var result = itemData.foods
+    console.log(result.food)
+
+      callback(result);
+  })
+}
+
+function url() {
+  return "https://immense-woodland-18375.herokuapp.com/foods"
 }
 
 function handleGetHelpRequest(intent, session, callback) {
@@ -112,7 +135,7 @@ function handleGetHelpRequest(intent, session, callback) {
 
     var shouldEndSession = false
 
-    callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+    callback(session.attributes, buildSpeechletResponseWithoutCard(output, repromptText, shouldEndSession))
 
 }
 
