@@ -1,31 +1,30 @@
 var request = require("request")
+var url = "https://immense-woodland-18375.herokuapp.com/foods"
 
 exports.handler = function (event, context) {
-    try {
-
-        if (event.session.new) {
-            onSessionStarted({requestId: event.request.requestId}, event.session);
-        }
-
-        if (event.request.type === "LaunchRequest") {
-            onLaunch(event.request,
-                event.session,
-                function callback(sessionAttributes, speechletResponse) {
-                    context.succeed(buildResponse(sessionAttributes, speechletResponse));
-                });
-        } else if (event.request.type === "IntentRequest") {
-            onIntent(event.request,
-                event.session,
-                function callback(sessionAttributes, speechletResponse) {
-                    context.succeed(buildResponse(sessionAttributes, speechletResponse));
-                });
-        } else if (event.request.type === "SessionEndedRequest") {
-            onSessionEnded(event.request, event.session);
-            context.succeed();
-        }
-    } catch (e) {
-        context.fail("Exception: " + e);
+  try {
+    if (event.session.new) {
+        onSessionStarted({requestId: event.request.requestId}, event.session);
     }
+    if (event.request.type === "LaunchRequest") {
+        onLaunch(event.request,
+            event.session,
+            function callback(sessionAttributes, speechletResponse) {
+                context.succeed(buildResponse(sessionAttributes, speechletResponse));
+            });
+    } else if (event.request.type === "IntentRequest") {
+        onIntent(event.request,
+            event.session,
+            function callback(sessionAttributes, speechletResponse) {
+                context.succeed(buildResponse(sessionAttributes, speechletResponse));
+            });
+    } else if (event.request.type === "SessionEndedRequest") {
+        onSessionEnded(event.request, event.session);
+        context.succeed();
+    }
+  } catch (e) {
+      context.fail("Exception: " + e);
+  }
 };
 
 
@@ -39,26 +38,26 @@ function onLaunch(launchRequest, session, callback) {
 }
 
 function onIntent(intentRequest, session, callback) {
-    var intent = intentRequest.intent
-    var intentName = intentRequest.intent.name;
+  var intent = intentRequest.intent
+  var intentName = intentRequest.intent.name;
 
-    if (intentName == "GetFoodItemIntent") {
-        handleGetFoodItemResopnse(intent, session, callback)
-    } else if (intentName == "CreateFoodItemIntent") {
-        handleCreateFoodItemResponse(intent, session, callback)
-    } else if (intentName == "AddFoodItemIntent") {
-        handleAddFoodItemResponse(intent, session, callback)
-    } else if (intentName == "ReomveFoodItemIntent") {
-        handleRemoveFoodItemResponse(intent, session, callback)
-    } else if (intentName == "AMAZON.HelpIntent") {
-        handleGetHelpRequest(intent, session, callback)
-    } else if (intentName == "AMAZON.StopIntent") {
-        handleFinishSessionRequest(intent, session, callback)
-    } else if (intentName == "AMAZON.CancelIntent") {
-        handleFinishSessionRequest(intent, session, callback)
-    } else {
-        throw "Invalid intent"
-    }
+  if (intentName == "GetFoodItemIntent") {
+      handleGetFoodItemResopnse(intent, session, callback)
+  } else if (intentName == "CreateFoodItemIntent") {
+      handleCreateFoodItemResponse(intent, session, callback)
+  } else if (intentName == "AddFoodItemIntent") {
+      handleAddFoodItemResponse(intent, session, callback)
+  } else if (intentName == "RemoveFoodItemIntent") {
+      handleRemoveFoodItemResponse(intent, session, callback)
+  } else if (intentName == "AMAZON.HelpIntent") {
+      handleGetHelpRequest(intent, session, callback)
+  } else if (intentName == "AMAZON.StopIntent") {
+      handleFinishSessionRequest(intent, session, callback)
+  } else if (intentName == "AMAZON.CancelIntent") {
+      handleFinishSessionRequest(intent, session, callback)
+  } else {
+      throw "Invalid intent"
+  }
 }
 
 
@@ -69,57 +68,125 @@ function onSessionEnded(sessionEndedRequest, session) {
 
 
 function getWelcomeResponse(callback) {
-    var speechOutput = "Welcome to you're home inventory. You can check your inventory by asking what items you have, you can add or remove items and even create new item-slots."
-    + " For example... say something like add 6 apples to my inventory. Or how many apples are in my inventory?"
-
-    var reprompt = "What would you like to do? You can check your inventory by asking what items you have, you can add or remove items and even create new item slots in your inventory."
-
-    var header = "Home Invnetory!"
-
-    var shouldEndSession = false
-
-    var sessionAttributes = {
-        "speechOutput" : speechOutput,
-        "repromptText" : reprompt
-    }
-
-    callback(sessionAttributes, buildSpeechletResponse(header, speechOutput, reprompt, shouldEndSession))
-
+  var speechOutput = "Welcome to KIM, your kitchen inventory manager. You can check your inventory by asking what items you have, you can add or remove items and even create new item cards."
+  + " For example... say something like add 6 apples to my inventory. Or how many apples are in my inventory?"
+  var reprompt = "What would you like to do? You can check your inventory by asking what items you have, you can add or remove items and even create new item cards in your inventory."
+  var header = "KIM!"
+  var shouldEndSession = false
+  var sessionAttributes = {
+      "speechOutput" : speechOutput,
+      "repromptText" : reprompt
+  }
+  callback(sessionAttributes, buildSpeechletResponse(header, speechOutput, reprompt, shouldEndSession))
 }
 
-
-
 function handleGetFoodItemResopnse(intent, session, callback) {
-    getJSON(function(itemData) {
-      var itemName = intent.slots.ItemName.value
-      var speechOutput = itemName
-      var repromptText = ''
-      var shouldEndSession = false
-      if (itemData != "ERORR") {
-      itemData.forEach(function(item) {
+  getJSON(function(data) {
+    var itemName = intent.slots.Item.value
+    var speechOutput = itemName
+    var repromptText = ''
+    var shouldEndSession = false
+    var itemsData = data.foods
+    if (itemsData != "ERORR") {
+      itemsData.forEach(function(item) {
         if(item.food === itemName) {
-          console.log(item.food)
           speechOutput = `You have ${item.quantity} ${item.food}`
         }
       })
+    }
+    callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+  })
+}
+
+function handleAddFoodItemResponse(intent, session, callback) {
+  var newQuantity = 0
+  getJSON(function(data){
+    var itemName = intent.slots.Item.value
+    var additionalQuantity = intent.slots.ItemQuantity.value
+    var speechOutput = itemName
+    var repromptText = ''
+    var shouldEndSession = false
+    var itemsData = data.foods
+    var putUrl = url
+  if (itemsData) {
+    itemsData.forEach(function(item) {
+      if(item.food === itemName) {
+      putUrl += "/" + item.id
+       newQuantity = parseInt(item.quantity) + parseInt(additionalQuantity)
       }
-      callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
     })
+    request({
+      url: putUrl,
+      method: 'PUT',
+      headers: {
+          Accept: 'application/json',
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          quantity: newQuantity
+      })
+    }, function(error, res, body) {
+        speechOutput = `Inventory updated, you now have ${newQuantity} ${itemName}`
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      }
+    );
+  } else {
+      callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+    }
+  })
+}
+
+function handleRemoveFoodItemResponse(intent, session, callback) {
+  var newQuantity = 0
+  getJSON(function(data){
+    var itemName = intent.slots.Item.value
+    var quantityToRemove = intent.slots.ItemQuantity.value
+    var speechOutput = itemName
+    var repromptText = ''
+    var shouldEndSession = false
+    var itemsData = data.foods
+    var putUrl = url
+  if (itemsData) {
+    itemsData.forEach(function(item) {
+      if(item.food === itemName) {
+        putUrl += "/" + item.id
+        if((parseInt(item.quantity) - parseInt(quantityToRemove)) > 0) {
+         newQuantity = parseInt(item.quantity) - parseInt(quantityToRemove)
+       } else {
+         newQuantity = 0
+         speechOutput = `You only have ${item.quanitiy} ${itemName}. Removed ${item.quanitiy} ${itemName} from your inventory`
+       }
+      }
+    })
+    request({
+      url: putUrl,
+      method: 'PUT',
+      headers: {
+          Accept: 'application/json',
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          quantity: newQuantity
+      })
+    }, function(error, res, body) {
+        speechOutput = `Inventory updated, you now have ${newQuantity} ${itemName}`
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      }
+    );
+  } else {
+      callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+    }
+  })
 }
 
 function getJSON(callback){
-  request.get(url(), function(error, response, body){
-    var itemData = JSON.parse(body);
-    var result = itemData.foods
-
-
+  request.get(url, function(error, response, body){
+    var itemsData = JSON.parse(body);
+    var result = itemsData
       callback(result);
   })
 }
 
-function url() {
-  return "https://immense-woodland-18375.herokuapp.com/foods"
-}
 
 function handleGetHelpRequest(intent, session, callback) {
     // Ensure that session.attributes has been initialized
@@ -127,8 +194,8 @@ function handleGetHelpRequest(intent, session, callback) {
         session.attributes = {};
     }
 
-    var speechOutput = "You can check your inventory by asking what items you have. You can add or remove items and even create new item-slots."
-    + " For example... say something like add 6 apples to my inventory. Or how many apples are in my inventory?" + " If you would like to add a new item-slot, say something like, create oranges in inventory or add new Oranges slot to my inventory"
+    var speechOutput = "You can check your inventory by asking what items you have. You can add or remove items and even create new item cards."
+    + " For example... say something like add 6 apples to my inventory. Or how many apples are in my inventory?" + " If you would like to add a new item card, say something like, create oranges in inventory or add new Oranges card to my inventory"
 
     var repromptText = speechOutput
 
@@ -141,7 +208,7 @@ function handleGetHelpRequest(intent, session, callback) {
 function handleFinishSessionRequest(intent, session, callback) {
     // End the session with a "Good bye!" if the user wants to quit the game
     callback(session.attributes,
-        buildSpeechletResponseWithoutCard("Good bye! Thank you for using Home Inventory!", "", true));
+        buildSpeechletResponseWithoutCard("Good bye! Thank you for using KIM, your kitchen inventory manager!", "", true));
 }
 
 
