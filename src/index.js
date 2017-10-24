@@ -92,17 +92,16 @@ function getWelcomeResponse(callback) {
 function handleGetFoodItemResopnse(intent, session, callback) {
     getJSON(function(itemData) {
       var itemName = intent.slots.ItemName.value
-      console.log(itemName)
-      var speechOutput = "There was an error"
+      var speechOutput = itemName
       var repromptText = ''
       var shouldEndSession = false
       if (itemData != "ERORR") {
       itemData.forEach(function(item) {
         if(item.food === itemName) {
-          speechOutput = item.food
+          console.log(item.food)
+          speechOutput = `You have ${item.quantity} ${item.food}`
         }
       })
-
       }
       callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
     })
@@ -112,7 +111,7 @@ function getJSON(callback){
   request.get(url(), function(error, response, body){
     var itemData = JSON.parse(body);
     var result = itemData.foods
-    console.log(result.food)
+
 
       callback(result);
   })
