@@ -49,6 +49,8 @@ function onIntent(intentRequest, session, callback) {
       handleAddFoodItemResponse(intent, session, callback)
   } else if (intentName == "RemoveFoodItemIntent") {
       handleRemoveFoodItemResponse(intent, session, callback)
+  } else if (intentName == "GetFoodsByType") {
+      handleGetFoodsByTypeResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
   } else if (intentName == "AMAZON.StopIntent") {
@@ -177,6 +179,40 @@ function handleRemoveFoodItemResponse(intent, session, callback) {
       callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
     }
   })
+}
+
+function handleGetFoodsByTypeResponse(intent, session, callback) {
+  getJSON(function(data) {
+    var itemType = intent.slots.food_type.value
+    var speechOutput = itemType
+    var repromptText = ''
+    var shouldEndSession = false
+    var itemsData = data.foods
+    var itemsList = 'You have, '
+    var itemsArray = []
+    if (itemsData) {
+      itemsData.forEach(function(item) {
+        if(item.food_type === itemType) {
+          itemsArray.push(`${item.quantity} ${item.food}`)
+        }
+      })
+      speechOutput = itemsList + toSentence(itemsArray)
+    }
+    callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+  })
+}
+
+function toSentence(array) {
+  if (array.length === 0) {
+    return ''
+  }
+  var string = '';
+  var last = array.splice(-2)
+  var lastString = last[0] + ' and ' + last[1]
+  for (var i = 0; i < array.length; i++) {
+    string += array[i] + ", "
+  }
+return string + lastString
 }
 
 function getJSON(callback){
