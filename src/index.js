@@ -152,7 +152,7 @@ function handleRemoveFoodItemResponse(intent, session, callback) {
     itemsData.forEach(function(item) {
       if(item.food === itemName) {
         putUrl += "/" + item.id
-        if((parseInt(item.quantity) - parseInt(quantityToRemove)) > 0) {
+        if((parseInt(item.quantity) - parseInt(quantityToRemove)) >= 0) {
          newQuantity = parseInt(item.quantity) - parseInt(quantityToRemove)
        } else {
          newQuantity = 0
@@ -188,12 +188,16 @@ function handleGetFoodsByTypeResponse(intent, session, callback) {
     var repromptText = ''
     var shouldEndSession = false
     var itemsData = data.foods
-    var itemsList = 'You have, '
+    var itemsList = 'You have '
     var itemsArray = []
     if (itemsData) {
       itemsData.forEach(function(item) {
         if(item.food_type === itemType) {
-          itemsArray.push(`${item.quantity} ${item.food}`)
+          if(itemType !== 'spices' && itemType !== 'miscellaneous') {
+            itemsArray.push(`${item.quantity} ${item.food}`)
+          } else {
+            itemsArray.push(`${item.food}`)
+          }
         }
       })
       speechOutput = itemsList + toSentence(itemsArray)
