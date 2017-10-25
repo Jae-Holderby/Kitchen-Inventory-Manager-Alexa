@@ -1,0 +1,66 @@
+{
+  "intents": [
+    {
+      "slots": [
+        {
+          "name": "Item",
+          "type": "ITEMS"
+        },
+        {
+          "name": "ItemQuantity",
+          "type": "AMAZON.NUMBER"
+        }
+      ],
+      "intent": "AddFoodItemIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "slots": [
+        {
+          "name": "Item",
+          "type": "ITEMS"
+        }
+      ],
+      "intent": "CreateFoodItemIntent"
+    },
+    {
+      "slots": [
+        {
+          "name": "Item",
+          "type": "ITEMS"
+        }
+      ],
+      "intent": "GetFoodItemIntent"
+    },
+    {
+      "slots": [
+        {
+          "name": "food_type",
+          "type": "FOOD_TYPES"
+        }
+      ],
+      "intent": "GetFoodsByType"
+    },
+    {
+      "slots": [
+        {
+          "name": "Item",
+          "type": "ITEMS"
+        },
+        {
+          "name": "ItemQuantity",
+          "type": "AMAZON.NUMBER"
+        }
+      ],
+      "intent": "RemoveFoodItemIntent"
+    }
+  ]
+}

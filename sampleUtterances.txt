@@ -1,0 +1,34 @@
+AddFoodItemIntent add {ItemQuantity} {Item} to inventory
+AddFoodItemIntent add {ItemQuantity} {Item} to my inventory
+AddFoodItemIntent add {ItemQuantity} {Item}
+CreateFoodItemIntent create {Item} slot in inventory
+CreateFoodItemIntent add new {Item} to my inventory
+CreateFoodItemIntent add new {Item} to inventory
+CreateFoodItemIntent create {Item} in inventory
+CreateFoodItemIntent make new {Item} slot in inventory
+CreateFoodItemIntent make new {Item} slot in my inventory
+CreateFoodItemIntent create {Item} in my inventory
+CreateFoodItemIntent create {Item} slot in my inventory
+CreateFoodItemIntent add new {Item} in inventory
+CreateFoodItemIntent add new {Item} in my inventory
+GetFoodItemIntent Do I have any {Item}
+GetFoodItemIntent How many {Item} do I have
+GetFoodItemIntent How many {Item} are there
+GetFoodItemIntent tell me my {Item} count
+GetFoodItemIntent Am I out of {Item}
+RemoveFoodItemIntent remove {ItemQuantity} {Item}
+RemoveFoodItemIntent remove {ItemQuantity} {Item} from inventory
+RemoveFoodItemIntent remove {ItemQuantity} {Item} from my inventory
+RemoveFoodItemIntent remove {Item} from inventory
+RemoveFoodItemIntent remove {Item} from my inventory
+RemoveFoodItemIntent remove all {Item} from inventory
+RemoveFoodItemIntent remove all {Item} from my inventory
+RemoveFoodItemIntent remove {Item}
+RemoveFoodItemIntent remove all {Item}
+GetFoodsByType what {food_type} do I have
+GetFoodsByType what kinds {food_type} do I have
+GetFoodsByType give me a list of {food_type}
+GetFoodsByType list off my {food_type}
+GetFoodsByType list off the {food_type} in my inventory
+GetFoodsByType list off {food_type} in my inventory
+GetFoodsByType list {food_type}
