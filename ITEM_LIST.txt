@@ -109,3 +109,27 @@ pineapples
 pomegranates
 raisins
 strawberries
+acorn squash
+allspice
+basil
+bay leaves
+cayenne
+chili powder
+cloves
+curry powder
+dill weed
+garlic powder
+ground ginger
+nutmeg
+onion powder
+oregano
+paprika
+pepper
+red pepper flakes
+rosemary
+saffron
+sage
+tarragon
+thyme
+vanilla extract
+vanilla beans
