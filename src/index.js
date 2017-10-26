@@ -1,5 +1,6 @@
 var request = require("request")
-var url = "https://immense-woodland-18375.herokuapp.com/foods"
+var foodUrl = "https://immense-woodland-18375.herokuapp.com/foods"
+var recipesUrl = "https://immense-woodland-18375.herokuapp.com/recipes"
 
 exports.handler = function (event, context) {
   try {
@@ -41,6 +42,8 @@ function onIntent(intentRequest, session, callback) {
   var intent = intentRequest.intent
   var intentName = intentRequest.intent.name;
 
+
+
   if (intentName == "GetFoodItemIntent") {
       handleGetFoodItemResopnse(intent, session, callback)
   } else if (intentName == "CreateFoodItemIntent") {
@@ -51,6 +54,8 @@ function onIntent(intentRequest, session, callback) {
       handleRemoveFoodItemResponse(intent, session, callback)
   } else if (intentName == "GetFoodsByType") {
       handleGetFoodsByTypeResponse(intent, session, callback)
+  } else if (intentName == "ListIngredientsInRecipe") {
+      handleListIngredientsInRecipeResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
   } else if (intentName == "AMAZON.StopIntent") {
@@ -83,7 +88,7 @@ function getWelcomeResponse(callback) {
 }
 
 function handleGetFoodItemResopnse(intent, session, callback) {
-  getJSON(function(data) {
+  getFoodJSON(function(data) {
     var itemName = intent.slots.Item.value
     var speechOutput = itemName
     var repromptText = ''
@@ -102,14 +107,14 @@ function handleGetFoodItemResopnse(intent, session, callback) {
 
 function handleAddFoodItemResponse(intent, session, callback) {
   var newQuantity = 0
-  getJSON(function(data){
+  getFoodJSON(function(data){
     var itemName = intent.slots.Item.value
     var additionalQuantity = intent.slots.ItemQuantity.value
     var speechOutput = itemName
     var repromptText = "Is there anything else you'd like to add?"
     var shouldEndSession = false
     var itemsData = data.foods
-    var putUrl = url
+    var putUrl = foodUrl
   if (itemsData) {
     itemsData.forEach(function(item) {
       if(item.food === itemName) {
@@ -140,14 +145,14 @@ function handleAddFoodItemResponse(intent, session, callback) {
 
 function handleRemoveFoodItemResponse(intent, session, callback) {
   var newQuantity = 0
-  getJSON(function(data){
+  getFoodJSON(function(data){
     var itemName = intent.slots.Item.value
     var quantityToRemove = intent.slots.ItemQuantity.value
     var speechOutput = itemName
     var repromptText = "Is there anything else you'd like to remove?"
     var shouldEndSession = false
     var itemsData = data.foods
-    var putUrl = url
+    var putUrl = foodUrl
   if (itemsData) {
     itemsData.forEach(function(item) {
       if(item.food === itemName) {
@@ -182,7 +187,7 @@ function handleRemoveFoodItemResponse(intent, session, callback) {
 }
 
 function handleGetFoodsByTypeResponse(intent, session, callback) {
-  getJSON(function(data) {
+  getFoodJSON(function(data) {
     var itemType = intent.slots.food_type.value
     var speechOutput = itemType
     var repromptText = ''
@@ -206,6 +211,43 @@ function handleGetFoodsByTypeResponse(intent, session, callback) {
   })
 }
 
+function handleListIngredientsInRecipeResponse(intent, session, callback) {
+  getRecipeJSON(function(data) {
+    var recipeName = intent.slots.recipe_name.value
+    var speechOutput = recipeName
+    var repromptText = ''
+    var shouldEndSession = false
+    var recipesData = data.recipes
+    var recipeUrl = recipesUrl
+    if(recipesData) {
+      recipesData.forEach(function(recipe) {
+        if(recipeName === recipe.recipe){
+          recipeUrl += "/" + recipe.id
+        }
+      })
+      request.get(recipeUrl, function(error, response, body){
+        var recipeData = JSON.parse(body)
+        var recipeName = recipeData.recipe.name
+        var ingredients = recipeData.recipe.ingredients
+        var itemsArray = []
+        ingredients.forEach(function(item){
+          if(item.quantity !== null){
+            itemsArray.push(`${item.quantity} ${item.ingredient}`)
+          } else if(item.quantity === null) {
+            itemsArray.push(`${item.ingredient}`)
+          }
+        })
+        var sentance = toSentence(itemsArray)
+        speechOutput = `To make ${recipeName}, You will need ${sentance}`
+
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      })
+    } else {
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      }
+  })
+}
+
 function toSentence(array) {
   if (array.length === 0) {
     return ''
@@ -219,12 +261,20 @@ function toSentence(array) {
 return string + lastString
 }
 
-function getJSON(callback){
-  request.get(url, function(error, response, body){
+function getFoodJSON(callback){
+  request.get(foodUrl, function(error, response, body){
     var itemsData = JSON.parse(body);
     var result = itemsData
       callback(result);
   })
+}
+
+function getRecipeJSON(callback){
+  request.get(recipesUrl, function(error, response, body){
+    var recipesData = JSON.parse(body)
+    var result = recipesData
+    callback(result);
+    })
 }
 
 
