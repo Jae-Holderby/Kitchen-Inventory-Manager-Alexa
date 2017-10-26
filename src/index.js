@@ -106,7 +106,7 @@ function handleAddFoodItemResponse(intent, session, callback) {
     var itemName = intent.slots.Item.value
     var additionalQuantity = intent.slots.ItemQuantity.value
     var speechOutput = itemName
-    var repromptText = ''
+    var repromptText = "Is there anything else you'd like to add?"
     var shouldEndSession = false
     var itemsData = data.foods
     var putUrl = url
@@ -144,7 +144,7 @@ function handleRemoveFoodItemResponse(intent, session, callback) {
     var itemName = intent.slots.Item.value
     var quantityToRemove = intent.slots.ItemQuantity.value
     var speechOutput = itemName
-    var repromptText = ''
+    var repromptText = "Is there anything else you'd like to remove?"
     var shouldEndSession = false
     var itemsData = data.foods
     var putUrl = url
