@@ -52,6 +52,15 @@
     {
       "slots": [
         {
+          "name": "recipe_name",
+          "type": "AMAZON.Food"
+        }
+      ],
+      "intent": "ListIngredientsInRecipe"
+    },
+    {
+      "slots": [
+        {
           "name": "Item",
           "type": "ITEMS"
         },

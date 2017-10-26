@@ -32,3 +32,7 @@ GetFoodsByType list off my {food_type}
 GetFoodsByType list off the {food_type} in my inventory
 GetFoodsByType list off {food_type} in my inventory
 GetFoodsByType list {food_type}
+ListIngredientsInRecipe what is in {recipe_name}
+ListIngredientsInRecipe what do I need to make {recipe_name}
+ListIngredientsInRecipe what do I need for {recipe_name}
+ListIngredientsInRecipe what ingredients are in {recipe_name}
