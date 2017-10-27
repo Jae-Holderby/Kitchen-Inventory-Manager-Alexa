@@ -79,6 +79,15 @@
     {
       "slots": [
         {
+          "name": "recipe_status",
+          "type": "RECIPE_STATUS"
+        }
+      ],
+      "intent": "ListSelectedRecipes"
+    },
+    {
+      "slots": [
+        {
           "name": "Item",
           "type": "ITEMS"
         },

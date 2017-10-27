@@ -56,7 +56,7 @@ function onIntent(intentRequest, session, callback) {
       handleListIngredientsInRecipeResponse(intent, session, callback)
   } else if (intentName == "SelectRecipe") {
       handleSelectRecipeResponse(intent, session, callback)
-  } else if (intentName == "ListIngredientsInRecipe") {
+  } else if (intentName == "UnselectRecipe") {
       handleUnselectRecipeResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
@@ -305,7 +305,7 @@ function handleUnselectRecipeResponse(intent, session, callback) {
         if(recipe.selected === true) {
           recipeUrl += "/" + recipe.id
         } else {
-          speechOutput = `${recipeName} has already been selected`
+          speechOutput = `${recipeName} is not selected`
           return callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
         }
       }
