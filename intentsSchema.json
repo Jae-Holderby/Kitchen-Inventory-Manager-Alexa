@@ -70,6 +70,15 @@
     {
       "slots": [
         {
+          "name": "recipe_name",
+          "type": "AMAZON.Food"
+        }
+      ],
+      "intent": "UnselectRecipe"
+    },
+    {
+      "slots": [
+        {
           "name": "Item",
           "type": "ITEMS"
         },

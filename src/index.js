@@ -56,6 +56,8 @@ function onIntent(intentRequest, session, callback) {
       handleListIngredientsInRecipeResponse(intent, session, callback)
   } else if (intentName == "SelectRecipe") {
       handleSelectRecipeResponse(intent, session, callback)
+  } else if (intentName == "ListIngredientsInRecipe") {
+      handleUnselectRecipeResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
   } else if (intentName == "AMAZON.StopIntent") {
@@ -67,7 +69,6 @@ function onIntent(intentRequest, session, callback) {
   }
 
 }
-
 
 function onSessionEnded(sessionEndedRequest, session) {
 
@@ -281,6 +282,46 @@ function handleSelectRecipeResponse(intent, session, callback) {
       })
     }, function(error, res, body) {
         speechOutput = `${recipeName} is now selected`
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      })
+    } else {
+        callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+      }
+  })
+}
+
+function handleUnselectRecipeResponse(intent, session, callback) {
+  getRecipeJSON(function(data){
+    var recipeName = intent.slots.recipe_name.value
+    var speechOutput = recipeName
+    var repromptText = ''
+    var shouldEndSession = false
+    var recipesData = data.recipes
+    var recipeUrl = recipesUrl
+    if(recipesData){
+    recipesData.forEach(function(recipe) {
+      if(recipeName === recipe.recipe){
+
+        if(recipe.selected === true) {
+          recipeUrl += "/" + recipe.id
+        } else {
+          speechOutput = `${recipeName} has already been selected`
+          return callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+        }
+      }
+    })
+    request({
+      url: recipeUrl,
+      method: 'PUT',
+      headers: {
+          Accept: 'application/json',
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          selected: false
+      })
+    }, function(error, res, body) {
+        speechOutput = `${recipeName} is now unselected`
         callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
       })
     } else {
