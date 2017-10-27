@@ -61,6 +61,15 @@
     {
       "slots": [
         {
+          "name": "recipe_name",
+          "type": "AMAZON.Food"
+        }
+      ],
+      "intent": "SelectRecipe"
+    },
+    {
+      "slots": [
+        {
           "name": "Item",
           "type": "ITEMS"
         },

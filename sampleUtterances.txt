@@ -36,3 +36,4 @@ ListIngredientsInRecipe what is in {recipe_name}
 ListIngredientsInRecipe what do I need to make {recipe_name}
 ListIngredientsInRecipe what do I need for {recipe_name}
 ListIngredientsInRecipe what ingredients are in {recipe_name}
+SelectRecipe select {recipe_name}
