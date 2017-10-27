@@ -37,6 +37,6 @@ SelectRecipe select {recipe_name}
 UnselectRecipe unselect {recipe_name}
 ListSelectedRecipes list off {recipe_status}
 ListSelectedRecipes list {recipe_status}
-UseSelectedRecipes use {recipe_name}
-UseSelectedRecipes make {recipe_name}
-UseSelectedRecipes I'm making {recipe_name}
+UseRecipe use {recipe_name}
+UseRecipe make {recipe_name}
+UseRecipe I'm making {recipe_name}

@@ -92,7 +92,7 @@
           "type": "AMAZON.Food"
         }
       ],
-      "intent": "UseSelectedRecipes"
+      "intent": "UseRecipe"
     },
     {
       "slots": [
