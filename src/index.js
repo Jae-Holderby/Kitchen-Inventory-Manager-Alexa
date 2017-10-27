@@ -58,6 +58,8 @@ function onIntent(intentRequest, session, callback) {
       handleSelectRecipeResponse(intent, session, callback)
   } else if (intentName == "UnselectRecipe") {
       handleUnselectRecipeResponse(intent, session, callback)
+  } else if (intentName == "ListSelectedRecipes") {
+      handleListSelectedRecipesResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
   } else if (intentName == "AMAZON.StopIntent") {
@@ -328,6 +330,27 @@ function handleUnselectRecipeResponse(intent, session, callback) {
         callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
       }
   })
+}
+
+function handleListSelectedRecipesResponse(intent, session, callback) {
+    getRecipeJSON(function(data){
+      var recipeName = intent.slots.recipe_status.value
+      var speechOutput = recipeName
+      var repromptText = ''
+      var shouldEndSession = false
+      var recipesData = data.recipes
+      var recipeUrl = recipesUrl
+      var recipeArray = []
+      if(recipesData){
+        recipesData.forEach(function(recipe){
+          if(recipe.selected){
+            recipeArray.push(`${recipe.recipe}`)
+          }
+        })
+        speechOutput = toSentence(recipeArray)
+      }
+      callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+    })
 }
 
 function toSentence(array) {

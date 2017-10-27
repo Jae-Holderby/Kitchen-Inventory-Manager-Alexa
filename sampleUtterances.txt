@@ -28,14 +28,12 @@ RemoveFoodItemIntent remove all {Item}
 GetFoodsByType what {food_type} do I have
 GetFoodsByType what kinds {food_type} do I have
 GetFoodsByType give me a list of {food_type}
-GetFoodsByType list off my {food_type}
-GetFoodsByType list off the {food_type} in my inventory
-GetFoodsByType list off {food_type} in my inventory
-GetFoodsByType list {food_type}
+GetFoodsByType tell me what {food_type} I have
 ListIngredientsInRecipe what is in {recipe_name}
 ListIngredientsInRecipe what do I need to make {recipe_name}
 ListIngredientsInRecipe what do I need for {recipe_name}
 ListIngredientsInRecipe what ingredients are in {recipe_name}
 SelectRecipe select {recipe_name}
 UnselectRecipe unselect {recipe_name}
+ListSelectedRecipes list off {recipe_status}
 ListSelectedRecipes list {recipe_status}
