@@ -1,5 +1,5 @@
 var request = require("request")
-var foodUrl = "https://immense-woodland-18375.herokuapp.com/foods"
+var foodsUrl = "https://immense-woodland-18375.herokuapp.com/foods"
 var recipesUrl = "https://immense-woodland-18375.herokuapp.com/recipes"
 
 exports.handler = function (event, context) {
@@ -60,6 +60,8 @@ function onIntent(intentRequest, session, callback) {
       handleUnselectRecipeResponse(intent, session, callback)
   } else if (intentName == "ListSelectedRecipes") {
       handleListSelectedRecipesResponse(intent, session, callback)
+  } else if (intentName == "UseRecipe") {
+      handleUseRecipeResponse(intent, session, callback)
   } else if (intentName == "AMAZON.HelpIntent") {
       handleGetHelpRequest(intent, session, callback)
   } else if (intentName == "AMAZON.StopIntent") {
@@ -118,7 +120,7 @@ function handleAddFoodItemResponse(intent, session, callback) {
     var repromptText = "Is there anything else you'd like to add?"
     var shouldEndSession = false
     var itemsData = data.foods
-    var putUrl = foodUrl
+    var putUrl = foodsUrl
   if (itemsData) {
     itemsData.forEach(function(item) {
       if(item.food === itemName) {
@@ -156,7 +158,7 @@ function handleRemoveFoodItemResponse(intent, session, callback) {
     var repromptText = "Is there anything else you'd like to remove?"
     var shouldEndSession = false
     var itemsData = data.foods
-    var putUrl = foodUrl
+    var putUrl = foodsUrl
   if (itemsData) {
     itemsData.forEach(function(item) {
       if(item.food === itemName) {
@@ -303,7 +305,6 @@ function handleUnselectRecipeResponse(intent, session, callback) {
     if(recipesData){
     recipesData.forEach(function(recipe) {
       if(recipeName === recipe.recipe){
-
         if(recipe.selected === true) {
           recipeUrl += "/" + recipe.id
         } else {
@@ -334,12 +335,10 @@ function handleUnselectRecipeResponse(intent, session, callback) {
 
 function handleListSelectedRecipesResponse(intent, session, callback) {
     getRecipeJSON(function(data){
-      var recipeName = intent.slots.recipe_status.value
       var speechOutput = recipeName
       var repromptText = ''
       var shouldEndSession = false
       var recipesData = data.recipes
-      var recipeUrl = recipesUrl
       var recipeArray = []
       if(recipesData){
         recipesData.forEach(function(recipe){
@@ -352,6 +351,98 @@ function handleListSelectedRecipesResponse(intent, session, callback) {
       callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
     })
 }
+
+function handleUseRecipeResponse(intent, session, callback) {
+  getRecipeJSON(function(data){
+    var recipeName = intent.slots.recipe_name.value
+    var speechOutput = ''
+    var repromptText = ''
+    var shouldEndSession = false
+    var recipesData = data.recipes
+    var recipeUrl = recipesUrl
+    if(recipesData){
+      recipesData.forEach(function(recipe){
+        if(recipeName === recipe.recipe){
+          recipeUrl += "/" + recipe.id
+        }
+      })
+      request.get(recipeUrl, function(error, response, body){
+        var recipeData = JSON.parse(body)
+        var ingredients = recipeData.recipe.ingredients
+        var requests = ingredients.map(function(item) {
+          var foodUrl = foodsUrl + '/' + item.food_id
+          return new Promise(function(resolve, reject){
+            request.get(foodUrl, function(error, response, body){
+              if (error){
+                reject(error)
+              } else {
+                resolve(JSON.parse(body))
+              }
+            })
+          })
+        })
+        Promise.all(requests)
+        .then(function(responses){
+          var newQuantityArray = []
+          speechOutput = `Sorry, you do not have the ingredients to make ${recipeName} in your inventory`
+          responses.forEach(function(item, index) {
+            if(item.data.quantity - ingredients[index].quantity < 0){
+              callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+            } else{
+              newQuantityArray.push(item.data.quantity - ingredients[index].quantity)
+            }
+          })
+          var putRequests = ingredients.map(function(item, index) {
+            foodUrl = foodsUrl + '/' + item.food_id
+            var newQuantity = newQuantityArray[index]
+            return new Promise(function(resolve, reject){
+              request({
+                url: foodUrl,
+                method: 'PUT',
+                headers: {
+                    Accept: 'application/json',
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    quantity: newQuantity
+                })
+              }, function(error, res, body) {
+                if (error){
+                  reject(error)
+                } else {
+                  resolve(JSON.parse(body))
+                }
+              })
+            })
+          })
+          Promise.all(putRequests)
+          .then(function(responses){
+            request({
+              url: recipeUrl,
+              method: 'PUT',
+              headers: {
+                  Accept: 'application/json',
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                  selected: false
+              })
+            }, function(error, res, body) {
+              speechOutput = `making ${recipeName} removing ingredients from your inventory. Enjoy`
+              callback(session.attributes, buildSpeechletResponseWithoutCard(speechOutput, repromptText, shouldEndSession))
+            })
+          }).catch(function(error){
+            console.log(error);
+          })
+        }).catch(function(error){
+          console.log(error);
+        })
+      })
+    }
+  })
+}
+
+
 
 function toSentence(array) {
   if (array.length === 0) {
@@ -367,7 +458,7 @@ return string + lastString
 }
 
 function getFoodJSON(callback){
-  request.get(foodUrl, function(error, response, body){
+  request.get(foodsUrl, function(error, response, body){
     var itemsData = JSON.parse(body);
     var result = itemsData
       callback(result);
