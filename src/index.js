@@ -265,7 +265,6 @@ function handleSelectRecipeResponse(intent, session, callback) {
     if(recipesData){
     recipesData.forEach(function(recipe) {
       if(recipeName === recipe.recipe){
-
         if(recipe.selected === false) {
           recipeUrl += "/" + recipe.id
         } else {
