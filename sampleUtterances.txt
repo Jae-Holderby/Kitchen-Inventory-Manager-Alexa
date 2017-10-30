@@ -1,14 +1,14 @@
 AddFoodItemIntent add {ItemQuantity} {Item} to inventory
 AddFoodItemIntent add {ItemQuantity} {Item} to my inventory
 AddFoodItemIntent add {ItemQuantity} {Item}
-CreateFoodItemIntent create {Item} slot in inventory
+CreateFoodItemIntent create {Item} card in inventory
 CreateFoodItemIntent add new {Item} to my inventory
 CreateFoodItemIntent add new {Item} to inventory
 CreateFoodItemIntent create {Item} in inventory
-CreateFoodItemIntent make new {Item} slot in inventory
-CreateFoodItemIntent make new {Item} slot in my inventory
+CreateFoodItemIntent make new {Item} card in inventory
+CreateFoodItemIntent make new {Item} card in my inventory
 CreateFoodItemIntent create {Item} in my inventory
-CreateFoodItemIntent create {Item} slot in my inventory
+CreateFoodItemIntent create {Item} card in my inventory
 CreateFoodItemIntent add new {Item} in inventory
 CreateFoodItemIntent add new {Item} in my inventory
 GetFoodItemIntent Do I have any {Item}
@@ -34,7 +34,7 @@ ListIngredientsInRecipe what do I need to make {recipe_name}
 ListIngredientsInRecipe what do I need for {recipe_name}
 ListIngredientsInRecipe what ingredients are in {recipe_name}
 SelectRecipe select {recipe_name}
-UnselectRecipe unselect {recipe_name}
+UnselectRecipe uncheck {recipe_name}
 ListSelectedRecipes list off {recipe_status}
 ListSelectedRecipes list {recipe_status}
 UseRecipe use {recipe_name}
