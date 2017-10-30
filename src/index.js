@@ -218,7 +218,7 @@ function handleGetFoodsByTypeResponse(intent, session, callback) {
 }
 
 function handleListIngredientsInRecipeResponse(intent, session, callback) {
-  getRecipeJSON(function(data) {
+  getRecipesJSON(function(data) {
     var recipeName = intent.slots.recipe_name.value
     var speechOutput = recipeName
     var repromptText = ''
@@ -255,7 +255,7 @@ function handleListIngredientsInRecipeResponse(intent, session, callback) {
 }
 
 function handleSelectRecipeResponse(intent, session, callback) {
-  getRecipeJSON(function(data){
+  getRecipesJSON(function(data){
     var recipeName = intent.slots.recipe_name.value
     var speechOutput = recipeName
     var repromptText = ''
@@ -295,7 +295,7 @@ function handleSelectRecipeResponse(intent, session, callback) {
 }
 
 function handleUnselectRecipeResponse(intent, session, callback) {
-  getRecipeJSON(function(data){
+  getRecipesJSON(function(data){
     var recipeName = intent.slots.recipe_name.value
     var speechOutput = recipeName
     var repromptText = ''
@@ -334,8 +334,8 @@ function handleUnselectRecipeResponse(intent, session, callback) {
 }
 
 function handleListSelectedRecipesResponse(intent, session, callback) {
-    getRecipeJSON(function(data){
-      var speechOutput = recipeName
+    getRecipesJSON(function(data){
+      var speechOutput = 'No recipes are selected'
       var repromptText = ''
       var shouldEndSession = false
       var recipesData = data.recipes
@@ -353,7 +353,7 @@ function handleListSelectedRecipesResponse(intent, session, callback) {
 }
 
 function handleUseRecipeResponse(intent, session, callback) {
-  getRecipeJSON(function(data){
+  getRecipesJSON(function(data){
     var recipeName = intent.slots.recipe_name.value
     var speechOutput = ''
     var repromptText = ''
@@ -465,7 +465,7 @@ function getFoodJSON(callback){
   })
 }
 
-function getRecipeJSON(callback){
+function getRecipesJSON(callback){
   request.get(recipesUrl, function(error, response, body){
     var recipesData = JSON.parse(body)
     var result = recipesData
